@@ -8,30 +8,30 @@
 
 import UIKit
 
-struct Address: Decodable {
-    var full: String
-}
 
-struct Property: Decodable {
-    var bathsFull: Int
-    var bathsHalf: Int
-    var bedrooms: Int
-}
-struct Geo: Decodable {
-    var lat: Float
-    var lng: Float
-}
 struct Listing: Decodable {
-    var listPrice: Int
-    var photos: [String]
-    var address: Address
-    var mlsId: Int
-    var listingId: String
-    var property: Property
-    var geo: Geo
-    var remarks: String
+    var listPrice: Int?
+    var photos: [String]?
+    var address: Address?
+    var mlsId: Int?
+    var listingId: String?
+    var property: Property?
+    var geo: Geo?
+    var remarks: String?
     
+    struct Address: Decodable {
+        var full: String?
+    }
     
+    struct Property: Decodable {
+        var bathsFull: Int?
+        var bathsHalf: Int?
+        var bedrooms: Int?
+    }
+    struct Geo: Decodable {
+        var lat: Float?
+        var lng: Float?
+    }
     static func fetchListing(_ completionHandler: @escaping ([Listing]) -> ()) {
         let baseUrl = URL(string: "http://localhost:8888/simplyrets/file.js")
         let task = URLSession.shared.dataTask(with: baseUrl!) { (data, response, error) in
@@ -58,4 +58,3 @@ struct Listing: Decodable {
         task.resume()
     }
 }
-
