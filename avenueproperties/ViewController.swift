@@ -26,7 +26,14 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
         collectionView?.dataSource = self
         collectionView?.delegate = self
     }
-    
+    func showListingDetailController(_ listing: Listing) {
+        let layout = UICollectionViewFlowLayout()
+        let listingDetailController = ListingDetailController(collectionViewLayout: layout)
+        listingDetailController.listing = listing
+        
+
+        navigationController?.pushViewController(listingDetailController, animated: true)
+    }
     // MARK: - Home CollectionViewController
     
     let homeCollectionView:UICollectionView = {
@@ -54,6 +61,13 @@ class HomeViewController: UICollectionViewController, UICollectionViewDelegateFl
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width, height: 200)
     }
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let listing = listings?[indexPath.item] {
+            showListingDetailController(listing)
+        }
+        
+    }
+
 }
 
 
@@ -63,19 +77,16 @@ class HomeCell: UICollectionViewCell {
         var listing: Listing? {
         didSet {
             setupThumbNailImage()
-            if let name = listing?.listingId {
-                nameLabel.text = name
+
+            if let theAddress = listing?.address?.full?.capitalized {
+                nameLabel.text = theAddress
             }
          
             if let listPrice = listing?.listPrice{
                 let nf = NumberFormatter()
                 nf.numberStyle = .decimal
-                
                 let subTitleCost = "$\(nf.string(from: NSNumber(value:(UInt64(listPrice))))!)"
                 costLabel.text = subTitleCost
-                
-          
-
             }
         }
     }
@@ -91,7 +102,7 @@ class HomeCell: UICollectionViewCell {
         let label = UILabel()
         label.text = "Best New Apps"
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = UIColor.blue
+        label.textColor = UIColor.white
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -101,6 +112,7 @@ class HomeCell: UICollectionViewCell {
         label.text = "400"
         label.font = UIFont.systemFont(ofSize: 12)
         label.textAlignment = .center
+        label.textColor = UIColor.white
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
