@@ -7,16 +7,23 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ListingSlides: BaseCell, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     var listings: [Listing]?
-
+    
+    var images:[String] = []
+    
     var listing: Listing? {
         didSet {
-            
+            self.images = (listing?.photos)!
+            print(images)
 
-            collectionView.reloadData()
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
+            
         }
     }
     
@@ -63,14 +70,15 @@ class ListingSlides: BaseCell, UICollectionViewDataSource, UICollectionViewDeleg
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ListingImageCell
-        
 
+        let url = listing!.photos![indexPath.row]
+        print(url)
+        let urls = NSURL(string: url)
+        let data = NSData(contentsOf: urls! as URL)
+        
+        cell.imageView.image = UIImage(data: data! as Data)
         cell.listing = listing
-//           if let imageName = listing?.photos?[indexPath.item] {
-//
-//                cell.imageView.image = UIImage(named: imageName)
-//
-//            }
+
         return cell
     }
     
@@ -84,17 +92,23 @@ class ListingSlides: BaseCell, UICollectionViewDataSource, UICollectionViewDeleg
 
 
      class ListingImageCell: BaseCell {
+//        var photos:[String] = []
+        var images = [String]()
         var listing:Listing? {
             didSet {
-                setupSlideImage()
+                for image in images {
+                    print(image)
+//                    imageView.sd_setImage(with: URL(string: "https://s3-us-west-2.amazonaws.com/cdn.simplyrets.com/properties/trial/home9.jpg"), placeholderImage: UIImage(named: "placeholder.png"))
+                }
+                
+                
+                
+//                imageView.sd_setImage(with: URL(string: "https://s3-us-west-2.amazonaws.com/cdn.simplyrets.com/properties/trial/home9.jpg"), placeholderImage: UIImage(named: "placeholder.png"))
+
+
+
             }
         }
-        func setupSlideImage() {
-            if let slideImageUrl = listing?.photos?.first {
-                imageView.loadImageUsingUrlString(urlString: slideImageUrl)
-            }
-        }
-        
         override init(frame: CGRect) {
             super.init(frame: frame)
             setupViews()
@@ -111,11 +125,7 @@ class ListingSlides: BaseCell, UICollectionViewDataSource, UICollectionViewDeleg
             iv.backgroundColor = UIColor.green
             return iv
         }()
-        func setupThumbNailImage() {
-            if let imageName = listing?.photos?.first {
-                imageView.loadImageUsingUrlString(urlString: imageName)
-            }
-        }
+
          override func setupViews() {
             super.setupViews()
 
@@ -128,4 +138,25 @@ class ListingSlides: BaseCell, UICollectionViewDataSource, UICollectionViewDeleg
         
     }
     
+}
+
+extension UIImageView {
+    func downloadedFrom(url: URL, contentMode mode: UIViewContentMode = .scaleAspectFill) {
+        contentMode = mode
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard
+//                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
+//                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
+                let data = data, error == nil,
+                let image = UIImage(data: data)
+                else { return }
+            DispatchQueue.main.async() { () -> Void in
+                self.image = image
+            }
+            }.resume()
+    }
+    func downloadedFrom(link: String, contentMode mode: UIViewContentMode = .scaleAspectFill) {
+        guard let url = URL(string: link) else { return }
+        downloadedFrom(url: url, contentMode: mode)
+    }
 }

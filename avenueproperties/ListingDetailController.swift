@@ -7,18 +7,18 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ListingDetailController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     let cellId = "cellId"
     let descriptionId = "descriptionId"
     let headerId = "headerId"
-    
+
     var listing: Listing? {
         didSet {
             if listing?.photos != nil {
                 print(listing?.photos)
 //                setupThumbNailImage()
-
                 return
             }
         }
